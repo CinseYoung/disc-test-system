@@ -37,7 +37,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
         <ul className="space-y-3 text-sm text-gray-600">
           <li className="flex items-start">
             <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold mr-3 mt-0.5 flex-shrink-0">1</span>
-            <span><strong>限时要求：</strong>10 分钟内完成所有题目</span>
+            <span><strong>限时要求：</strong>本测试限制时间15分钟，建议完成时间10分钟</span>
           </li>
           <li className="flex items-start">
             <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold mr-3 mt-0.5 flex-shrink-0">2</span>

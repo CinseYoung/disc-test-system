@@ -43,6 +43,6 @@ export const DISC_QUESTIONS: Question[] = [
   { id: 40, options: [{ text: "妥协: 为避免矛盾即使自己是对的也不惜放弃自己的立场", traits: { D: 0, I: 0, S: 1, C: 0 } }, { text: "好批评: 不断地衡量和下判断，经常考虑提出反对意见", traits: { D: 0, I: 0, S: 0, C: 1 } }, { text: "狡猾: 精明，总是有办法达到目的", traits: { D: 1, I: 0, S: 0, C: 0 } }, { text: "善变: 像孩子般注意力短暂，需要各种变化，怕无聊", traits: { D: 0, I: 1, S: 0, C: 0 } }] },
 ]
 
-export const TEST_DURATION = 10 * 60 // 10 分钟
+export const TEST_DURATION = 15 * 60 // 15 分钟
 export const COOLDOWN_DURATION = 5 * 60 // 5 分钟
 export const TOTAL_QUESTIONS = DISC_QUESTIONS.length
