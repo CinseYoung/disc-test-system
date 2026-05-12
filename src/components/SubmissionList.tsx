@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Eye, ChevronDown, Loader2 } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Eye, Loader2 } from 'lucide-react'
 import { formatDate, formatDuration } from '../utils/format'
 import { getDominantType } from '../utils/scoring'
 import SubmissionDetail from './SubmissionDetail'
@@ -35,6 +35,25 @@ export default function SubmissionList({
   onLoadMore,
 }: SubmissionListProps) {
   const [selectedSubmission, setSelectedSubmission] = useState<TestSubmission | null>(null)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
+
+  // IntersectionObserver 监听底部哨兵元素
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          onLoadMore()
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [hasMore, loadingMore, onLoadMore])
 
   // 首次加载动画
   if (loading && submissions.length === 0) {
@@ -170,22 +189,16 @@ export default function SubmissionList({
         })}
       </div>
 
-      {/* 加载更多 */}
+      {/* 无限滚动哨兵元素 */}
       {hasMore && (
-        <div className="text-center mt-6">
+        <div ref={loadMoreRef} className="text-center mt-6 py-4">
           {loadingMore ? (
             <div className="flex items-center justify-center text-gray-400 text-sm">
               <Loader2 size={18} className="animate-spin mr-2" />
               正在加载更多...
             </div>
           ) : (
-            <button
-              onClick={onLoadMore}
-              className="text-blue-500 hover:text-blue-700 font-medium text-sm flex items-center mx-auto transition-colors"
-            >
-              加载更多
-              <ChevronDown size={16} className="ml-1" />
-            </button>
+            <p className="text-gray-400 text-sm">滚动到底部自动加载更多</p>
           )}
         </div>
       )}
