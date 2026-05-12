@@ -3,12 +3,13 @@ import { BarChart3 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useTimer } from '../hooks/useTimer'
 import { calculateScores } from '../utils/scoring'
-import { TEST_DURATION, COOLDOWN_DURATION } from '../data/questions'
+import { TEST_DURATION, COOLDOWN_DURATION, TOTAL_QUESTIONS } from '../data/questions'
 import WelcomeScreen from '../components/WelcomeScreen'
 import NameInputScreen from '../components/NameInputScreen'
 import TestingScreen from '../components/TestingScreen'
 import ResultScreen from '../components/ResultScreen'
 import CooldownScreen from '../components/CooldownScreen'
+import ConfirmModal from '../components/ConfirmModal'
 import type { AppState, DISCScores } from '../types'
 
 const COOLDOWN_KEY = 'disc_cooldown_until'
@@ -32,6 +33,7 @@ export default function TestPage() {
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [scores, setScores] = useState<DISCScores>({ D: 0, I: 0, S: 0, C: 0 })
   const [submitting, setSubmitting] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   const handleTimeout = useCallback(() => {
     handleSubmit()
@@ -75,7 +77,14 @@ export default function TestPage() {
     setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }))
   }
 
-  async function handleSubmit() {
+  // 显示确认弹窗
+  const handleSubmit = () => {
+    setShowConfirmModal(true)
+  }
+
+  // 确认提交
+  const handleConfirmSubmit = async () => {
+    setShowConfirmModal(false)
     if (submitting) return
     setSubmitting(true)
     setAppState('submitting')
@@ -105,6 +114,11 @@ export default function TestPage() {
 
     setSubmitting(false)
     setAppState('result')
+  }
+
+  // 取消提交
+  const handleCancelSubmit = () => {
+    setShowConfirmModal(false)
   }
 
   const handleCloseResult = () => {
@@ -168,6 +182,16 @@ export default function TestPage() {
 
         {appState === 'cooldown' && (
           <CooldownScreen cooldownLeft={cooldownTimer.timeLeft} />
+        )}
+
+        {/* 提交确认弹窗 */}
+        {showConfirmModal && (
+          <ConfirmModal
+            answeredCount={Object.keys(answers).length}
+            totalQuestions={TOTAL_QUESTIONS}
+            onConfirm={handleConfirmSubmit}
+            onCancel={handleCancelSubmit}
+          />
         )}
       </main>
     </div>
