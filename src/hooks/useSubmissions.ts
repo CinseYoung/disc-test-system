@@ -7,6 +7,7 @@ const PAGE_SIZE = 20
 export function useSubmissions() {
   const [submissions, setSubmissions] = useState<TestSubmission[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [searchKeyword, setSearchKeyword] = useState('')
   const [totalCount, setTotalCount] = useState(0)
   const [page, setPage] = useState(0)
@@ -14,7 +15,13 @@ export function useSubmissions() {
 
   const fetchSubmissions = useCallback(async (pageNum = 0, keyword = searchKeyword) => {
     if (!supabase) return
-    setLoading(true)
+    
+    // 区分首次加载和加载更多
+    if (pageNum === 0) {
+      setLoading(true)
+    } else {
+      setLoadingMore(true)
+    }
 
     let query = supabase
       .from('test_submissions')
@@ -30,7 +37,11 @@ export function useSubmissions() {
 
     if (error) {
       console.error('查询提交记录失败:', error)
-      setLoading(false)
+      if (pageNum === 0) {
+        setLoading(false)
+      } else {
+        setLoadingMore(false)
+      }
       return
     }
 
@@ -43,7 +54,13 @@ export function useSubmissions() {
     setTotalCount(count || 0)
     setHasMore((data?.length || 0) === PAGE_SIZE)
     setPage(pageNum)
-    setLoading(false)
+    
+    // 区分设置加载状态
+    if (pageNum === 0) {
+      setLoading(false)
+    } else {
+      setLoadingMore(false)
+    }
   }, [searchKeyword])
 
   const loadMore = useCallback(() => {
@@ -93,6 +110,7 @@ export function useSubmissions() {
   return {
     submissions,
     loading,
+    loadingMore,
     totalCount,
     hasMore,
     searchKeyword,

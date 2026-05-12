@@ -7,6 +7,7 @@ export default function AdminPage() {
   const {
     submissions,
     loading,
+    loadingMore,
     totalCount,
     hasMore,
     searchKeyword,
@@ -77,6 +78,7 @@ export default function AdminPage() {
         <SubmissionList
           submissions={submissions}
           loading={loading}
+          loadingMore={loadingMore}
           hasMore={hasMore}
           onLoadMore={loadMore}
         />

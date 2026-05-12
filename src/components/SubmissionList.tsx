@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Eye, ChevronDown } from 'lucide-react'
+import { Eye, ChevronDown, Loader2 } from 'lucide-react'
 import { formatDate, formatDuration } from '../utils/format'
 import { getDominantType } from '../utils/scoring'
 import SubmissionDetail from './SubmissionDetail'
@@ -8,6 +8,7 @@ import type { TestSubmission } from '../types'
 interface SubmissionListProps {
   submissions: TestSubmission[]
   loading: boolean
+  loadingMore: boolean
   hasMore: boolean
   onLoadMore: () => void
 }
@@ -26,23 +27,38 @@ const TYPE_LABEL: Record<string, string> = {
   C: 'C 服从型',
 }
 
-export default function SubmissionList({ submissions, loading, hasMore, onLoadMore }: SubmissionListProps) {
+export default function SubmissionList({
+  submissions,
+  loading,
+  loadingMore,
+  hasMore,
+  onLoadMore,
+}: SubmissionListProps) {
   const [selectedSubmission, setSelectedSubmission] = useState<TestSubmission | null>(null)
 
+  // 首次加载动画
   if (loading && submissions.length === 0) {
     return (
       <div className="text-center py-20">
         <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-400 text-sm">加载中...</p>
+        <p className="text-gray-400 text-sm">正在加载提交记录...</p>
       </div>
     )
   }
 
+  // 空状态提示（无数据或搜索无结果）
   if (submissions.length === 0) {
     return (
-      <div className="text-center py-20 text-gray-400">
-        <p className="text-lg mb-1">暂无提交记录</p>
-        <p className="text-sm">等待候选人完成测试后，数据将在此处实时显示</p>
+      <div className="text-center py-16 px-4">
+        <div className="mb-4 text-gray-300">
+          <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01.002 2 2h-2.5a2 2 0 01-2-2m2.002 0h-3.5a2 2 0 01-2-2m0 0V5a2 2 0 012-2h3.5m-3.5 0h3.5m-3.5 0V7a2 2 0 012 2m0 0h-3.5M9 12h3.5m-3.5 0H5.002a2 2 0 00-2 2v2a2 2 0 002 2m2-4h3.5m0 0V5a2 2 0 00-2-2M9 5h3.5" />
+          </svg>
+        </div>
+        <p className="text-lg font-medium text-gray-500 mb-2">暂无提交记录</p>
+        <p className="text-sm text-gray-400">
+          等待候选人完成测试后，数据将在此处实时显示
+        </p>
       </div>
     )
   }
@@ -157,14 +173,20 @@ export default function SubmissionList({ submissions, loading, hasMore, onLoadMo
       {/* 加载更多 */}
       {hasMore && (
         <div className="text-center mt-6">
-          <button
-            onClick={onLoadMore}
-            disabled={loading}
-            className="text-blue-500 hover:text-blue-700 font-medium text-sm flex items-center mx-auto transition-colors disabled:opacity-50"
-          >
-            {loading ? '加载中...' : '加载更多'}
-            <ChevronDown size={16} className="ml-1" />
-          </button>
+          {loadingMore ? (
+            <div className="flex items-center justify-center text-gray-400 text-sm">
+              <Loader2 size={18} className="animate-spin mr-2" />
+              正在加载更多...
+            </div>
+          ) : (
+            <button
+              onClick={onLoadMore}
+              className="text-blue-500 hover:text-blue-700 font-medium text-sm flex items-center mx-auto transition-colors"
+            >
+              加载更多
+              <ChevronDown size={16} className="ml-1" />
+            </button>
+          )}
         </div>
       )}
 
