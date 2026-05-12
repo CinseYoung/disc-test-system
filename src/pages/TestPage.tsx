@@ -10,6 +10,8 @@ import TestingScreen from '../components/TestingScreen'
 import ResultScreen from '../components/ResultScreen'
 import CooldownScreen from '../components/CooldownScreen'
 import ConfirmModal from '../components/ConfirmModal'
+import RestoreModal from '../components/RestoreModal'
+import { useAutoSave, type DraftData } from '../hooks/useAutoSave'
 import type { AppState, DISCScores } from '../types'
 
 const COOLDOWN_KEY = 'disc_cooldown_until'
@@ -34,6 +36,11 @@ export default function TestPage() {
   const [scores, setScores] = useState<DISCScores>({ D: 0, I: 0, S: 0, C: 0 })
   const [submitting, setSubmitting] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showRestoreModal, setShowRestoreModal] = useState(false)
+  const [draft, setDraft] = useState<DraftData | null>(null)
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+
+  const { saveDraft, getDraft, clearDraft } = useAutoSave()
 
   const handleTimeout = useCallback(() => {
     handleSubmit()
@@ -61,6 +68,17 @@ export default function TestPage() {
     }
   }, [appState, cooldownTimer.timeLeft])
 
+  // 检查是否有草稿（仅在欢迎页面时检查）
+  useEffect(() => {
+    if (appState === 'welcome') {
+      const savedDraft = getDraft()
+      if (savedDraft) {
+        setDraft(savedDraft)
+        setShowRestoreModal(true)
+      }
+    }
+  }, [appState, getDraft])
+
   const handleStartFromWelcome = () => {
     setAppState('nameInput')
   }
@@ -75,6 +93,27 @@ export default function TestPage() {
 
   const handleSelectOption = (questionId: number, optionIndex: number) => {
     setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }))
+    // 自动保存草稿
+    saveDraft(answers, candidateName, currentQuestionIndex)
+  }
+
+  // 恢复草稿
+  const handleRestoreDraft = (savedDraft: DraftData) => {
+    setAnswers(savedDraft.answers)
+    setCandidateName(savedDraft.candidateName)
+    setCurrentQuestionIndex(savedDraft.currentQuestionIndex)
+    setShowRestoreModal(false)
+    setDraft(null)
+    timer.reset(TEST_DURATION)
+    timer.start()
+    setAppState('testing')
+  }
+
+  // 放弃草稿
+  const handleDiscardDraft = () => {
+    clearDraft()
+    setShowRestoreModal(false)
+    setDraft(null)
   }
 
   // 显示确认弹窗
@@ -112,6 +151,8 @@ export default function TestPage() {
       console.error('Supabase 未配置，数据仅保留在本地')
     }
 
+    // 提交成功后清除草稿
+    clearDraft()
     setSubmitting(false)
     setAppState('result')
   }
@@ -182,6 +223,15 @@ export default function TestPage() {
 
         {appState === 'cooldown' && (
           <CooldownScreen cooldownLeft={cooldownTimer.timeLeft} />
+        )}
+
+        {/* 恢复草稿弹窗 */}
+        {showRestoreModal && draft && (
+          <RestoreModal
+            draft={draft}
+            onRestore={handleRestoreDraft}
+            onDiscard={handleDiscardDraft}
+          />
         )}
 
         {/* 提交确认弹窗 */}
