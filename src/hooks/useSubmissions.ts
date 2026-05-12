@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import type { TestSubmission } from '../types'
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 5
 
 export function useSubmissions() {
   const [submissions, setSubmissions] = useState<TestSubmission[]>([])
