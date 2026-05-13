@@ -100,6 +100,13 @@ export default function TestPage() {
   // 跳转到指定题目
   const handleJumpToQuestion = (index: number) => {
     setCurrentQuestionIndex(index)
+    // 滚动到对应题目的位置
+    setTimeout(() => {
+      const element = document.getElementById(`question-${index + 1}`)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 100)
   }
 
   // 恢复草稿

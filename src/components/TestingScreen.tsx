@@ -52,6 +52,7 @@ export default function TestingScreen({ answers, timeLeft, currentQuestionIndex,
       <div className="space-y-4 sm:space-y-6">
         {DISC_QUESTIONS.map((q, index) => (
           <div
+            id={`question-${q.id}`}
             key={q.id}
             className={`bg-white p-4 sm:p-6 rounded-xl border transition-all ${
               answers[q.id] !== undefined
