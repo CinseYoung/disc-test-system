@@ -1,15 +1,18 @@
 import { Clock } from 'lucide-react'
 import { DISC_QUESTIONS, TOTAL_QUESTIONS } from '../data/questions'
 import { formatTime } from '../utils/format'
+import QuestionNavigator from './QuestionNavigator'
 
 interface TestingScreenProps {
   answers: Record<number, number>
   timeLeft: number
+  currentQuestionIndex: number
   onSelect: (questionId: number, optionIndex: number) => void
   onSubmit: () => void
+  onJumpToQuestion: (index: number) => void
 }
 
-export default function TestingScreen({ answers, timeLeft, onSelect, onSubmit }: TestingScreenProps) {
+export default function TestingScreen({ answers, timeLeft, currentQuestionIndex, onSelect, onSubmit, onJumpToQuestion }: TestingScreenProps) {
   const answeredCount = Object.keys(answers).length
   const isAllAnswered = answeredCount === TOTAL_QUESTIONS
   const progress = (answeredCount / TOTAL_QUESTIONS) * 100
@@ -88,6 +91,16 @@ export default function TestingScreen({ answers, timeLeft, onSelect, onSubmit }:
             </div>
           </div>
         ))}
+      </div>
+
+      {/* 题目导航器 */}
+      <div className="mt-8 sm:mt-10">
+        <QuestionNavigator
+          totalQuestions={TOTAL_QUESTIONS}
+          currentIndex={currentQuestionIndex}
+          answers={answers}
+          onJumpTo={onJumpToQuestion}
+        />
       </div>
 
       {/* 底部提交按钮 */}

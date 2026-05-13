@@ -97,6 +97,11 @@ export default function TestPage() {
     saveDraft(answers, candidateName, currentQuestionIndex)
   }
 
+  // 跳转到指定题目
+  const handleJumpToQuestion = (index: number) => {
+    setCurrentQuestionIndex(index)
+  }
+
   // 恢复草稿
   const handleRestoreDraft = (savedDraft: DraftData) => {
     setAnswers(savedDraft.answers)
@@ -198,8 +203,10 @@ export default function TestPage() {
           <TestingScreen
             answers={answers}
             timeLeft={timer.timeLeft}
+            currentQuestionIndex={currentQuestionIndex}
             onSelect={handleSelectOption}
             onSubmit={handleSubmit}
+            onJumpToQuestion={handleJumpToQuestion}
           />
         )}
 
